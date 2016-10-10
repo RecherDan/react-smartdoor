@@ -1,0 +1,64 @@
+body { padding-bottom: 70px; }
+
+
+
+.App {
+  text-align: center;
+}
+
+.App-smlogo {
+  float:left;
+  padding-Right: 10px;
+  height: 30px;
+  vertical-align: middle;
+}
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+.App-red {
+  color: red;
+  font-style: bold;
+  display:inline;
+}
+.App-green {
+  color: green;
+  font-style: bold;
+  display:inline;
+  padding-right: 10px;
+}
+.App-aligntextleft {
+  text-align: left;
+}
+.App-dooronline {
+  display:inline;
+}
+.App-lock {
+  float:right;
+  padding-Right: 70px;
+  height: 70px;
+  vertical-align: middle;
+  align: right;
+}
+.App-filltable {
+  width: 100%;
+}
+ .backgroundRed{
+        background: red;
+    }
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
