@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-
+import * as firebase from 'firebase';
 import './App.css';
 import TopBar from './topbar';
 import Footer from './footer';
@@ -8,6 +8,76 @@ import SelDoor from './seldoor';
 import Main from './main';
 import Help from './help';
 import Settings from './settings';
+var config = {
+      apiKey: "AIzaSyCRpzldmrnwtOf7M_TBBNGFofyswZ2IifQ",
+      authDomain: "smartdoor-2f29b.firebaseapp.com",
+      databaseURL: "https://smartdoor-2f29b.firebaseio.com",
+      storageBucket: "",
+      messagingSenderId: "693048105512"
+    };
+
+firebase.initializeApp(config, "App");
+function getAllUrlParams(url) {
+
+  // get query string from url (optional) or window
+  var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+
+  // we'll store the parameters here
+  var obj = {};
+
+  // if query string exists
+  if (queryString) {
+
+    // stuff after # is not part of query string, so get rid of it
+    queryString = queryString.split('#')[0];
+
+    // split our query string into its component parts
+    var arr = queryString.split('&');
+
+    for (var i=0; i<arr.length; i++) {
+      // separate the keys and the values
+      var a = arr[i].split('=');
+
+      // in case params look like: list[]=thing1&list[]=thing2
+      var paramNum = undefined;
+      var paramName = a[0].replace(/\[\d*\]/, function(v) {
+        paramNum = v.slice(1,-1);
+        return '';
+      });
+
+      // set parameter value (use 'true' if empty)
+      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+
+      // (optional) keep case consistent
+      paramName = paramName.toLowerCase();
+      paramValue = paramValue.toLowerCase();
+
+      // if parameter name already exists
+      if (obj[paramName]) {
+        // convert value to array (if still string)
+        if (typeof obj[paramName] === 'string') {
+          obj[paramName] = [obj[paramName]];
+        }
+        // if no array index number specified...
+        if (typeof paramNum === 'undefined') {
+          // put the value on the end of the array
+          obj[paramName].push(paramValue);
+        }
+        // if array index number specified...
+        else {
+          // put the value at that index number
+          obj[paramName][paramNum] = paramValue;
+        }
+      }
+      // if param name doesn't exist yet, set it
+      else {
+        obj[paramName] = paramValue;
+      }
+    }
+  }
+
+  return obj;
+}
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -36,13 +106,25 @@ class App extends Component {
     this.state = {
       doorselected: getCookie("doorselected"),
       door: getCookie("door"),
-      curpage: "main"
+      name: getCookie("name"),
+      curpage: "main",
+      app: false
+    }
+    console.log("door " + getAllUrlParams().doorname + " name: " + getAllUrlParams().name );
+    if ( getAllUrlParams().applogin === "true" ) {
+      this.state = {
+        doorselected: "true",
+        door: getAllUrlParams().doorname,
+        name: getAllUrlParams().name,
+        app: true
+      }
     }
   }
   render() {
+    
     return (
       <div className="App">
-        <TopBar pagechange={this.pagechange.bind(this)} door={this.state.door} doorchange={this.doorchange.bind(this) }/>
+        <TopBar pagechange={this.pagechange.bind(this)} door={this.state.door} doorchange={this.doorchange.bind(this) } name={this.state.name}/>
         { (() => {
           if ( this.state.doorselected === "true" ) {
             switch (this.state.curpage ) {
@@ -51,24 +133,35 @@ class App extends Component {
               case "settings":
                 return <Settings />
               default:
-                return <Main doorchange={this.doorchange.bind(this) } door={this.state.door}/>;
+                return <Main doorchange={this.doorchange.bind(this) } door={this.state.door} name={this.state.name}/>;
             }
           }
           else
-            return <SelDoor chooseDoor={this.chooseDoor.bind(this)}/>;
+            return <SelDoor chooseDoor={this.chooseDoor.bind(this)} name={this.state.name} app={this.state.app} />;
         })() }
         <Footer />
       </div>
     );
   }
-    chooseDoor(key) {
-      setCookie("door", key, 100);
-      setCookie("doorselected", "true", 100);
+    chooseDoor(name, door, remember) {
+      console.log(remember);
+      if ( remember === true) {
+        setCookie("name", name, 100);
+        setCookie("door", door, 100);
+        setCookie("doorselected", "true", 100);
+      }
+      else {
+        setCookie("doorselected", "false", 100);
+        setCookie("door", "", 100);
+      }
     this.setState( {
       doorselected: "true",
-      door: key
+      name: name,
+      door: door
     });
-      console.log("cliked");
+      const rootRef2 = firebase.database().ref().child('users');
+      const doorRef2 = rootRef2.child(name);
+      doorRef2.child('door').set(door);
     }
   doorsel() {
     console.log("change");

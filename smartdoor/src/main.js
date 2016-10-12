@@ -70,21 +70,27 @@ export default class Main extends React.Component {
           doorimg = "./loading.gif"
         }
         
-        var move = (this.state.status['move'] === undefined) ? false : this.state.status['move'] ;
+        var move = (this.state.status['move'] === undefined) ? "false" : this.state.status['move'] ;
+        var notification = (this.state.status['notification'] === undefined) ? "false" : this.state.status['notification'];
+        var lastnotification = this.state.notification;
         var lastmove = this.state.move;
         this.setState( {
          online: online,
          doorbutton: doorbutton,
          doorbuttondisabled: doorbuttondisabled,
          doorimg: doorimg,
-         lastmove: (lastmove === undefined) ? false : lastmove,
-         move: move
+         lastmove: (lastmove === undefined) ? "false" : lastmove,
+         move: move,
+         notification: notification,
+         lastnotification: (lastnotification === undefined) ? false : lastnotification
         });
-        if ( lastmove !== move ) {
+        if ( ((lastmove !== move) && (notification === "false")) ||  lastnotification !== notification ) {
           this.setState( {
-            showModal: (move === "true" ) ? true : false
+            showModal: (move === "true" ) ? true : ((notification === "true") ? true : false),
+            modaltitle: (notification === "true") ? this.state.status['notification-title'] : "Dont Forget!" ,
+            modalbody: (notification === "true") ? <div> {this.state.status['notification-msg']} </div> : <Memos memos={this.state.memos} doorid={this.props.door} /> 
           });
-          //setTimeout(function(){ this.setState({ showModal: false }); }, 10000);
+
         }
       }, 50);
     }
@@ -96,10 +102,11 @@ export default class Main extends React.Component {
     close() {
       this.setState({ showModal: false });
     }
-    writecom() {
+    writecom(command) {
       const rootRef2 = firebase.database().ref().child('doors');
       const doorRef2 = rootRef2.child(this.props.door);
-      doorRef2.child('todo').set(this.state.doorbutton);
+      doorRef2.child('todo').set(command);
+      doorRef2.child('todo-name').set(this.props.name);
       
     }
     open() {
@@ -110,12 +117,11 @@ export default class Main extends React.Component {
           <div>
           <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
           <Modal.Header closeButton>
-            <Modal.Title>Dont Forget!</Modal.Title>
+            <Modal.Title>{this.state.modaltitle}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Memos 
-              memos={this.state.memos} 
-              doorid={this.props.door} />
+            {this.state.modalbody}
+
            </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.close.bind(this)}>Close</Button>
@@ -140,10 +146,10 @@ export default class Main extends React.Component {
 
                                 <div>
                             <p>
-                              <Button bsStyle="primary" bsSize="large" disabled={this.state.doorbuttondisabled} onClick={this.writecom.bind(this)}>{this.state.doorbutton} Door</Button>
+                              <Button bsStyle="primary" bsSize="large" disabled={this.state.doorbuttondisabled} onClick={this.writecom.bind(this, this.state.doorbutton)}>{this.state.doorbutton} Door</Button>
                             </p>
                             <p>
-                              <Button bsStyle="danger" bsSize="large">Emergency</Button>
+                              <Button bsStyle="danger" bsSize="large"  onClick={this.writecom.bind(this, "Emergency")}>Emergency</Button>
                             </p>
                                   </div>
                         </td>

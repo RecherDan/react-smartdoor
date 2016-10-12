@@ -5,7 +5,9 @@ body { padding-bottom: 70px; }
 .App {
   text-align: center;
 }
-
+.App-link {
+  cursor:pointer;
+}
 .App-smlogo {
   float:left;
   padding-Right: 10px;

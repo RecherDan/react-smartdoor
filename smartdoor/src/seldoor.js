@@ -1,7 +1,6 @@
 import React from 'react';
-import { ListGroup } from 'react-bootstrap';
+import {  Well, FormGroup, FormControl, ControlLabel ,Button,  Form, Col, Checkbox } from 'react-bootstrap';
 import * as firebase from 'firebase';
-import Litem from './litem';
 
 var config = {
       apiKey: "AIzaSyCRpzldmrnwtOf7M_TBBNGFofyswZ2IifQ",
@@ -15,15 +14,15 @@ firebase.initializeApp(config, "third");
 
 
 export default class SelDoor extends React.Component {
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.state = {
         doors: ""
       } 
+      this.chooseDoor = this.props.chooseDoor.bind(this);
     }
     componentDidMount() {
       const rootRef = firebase.database().ref().child('doors');
-      //doorRef.set(mem);
       rootRef.on('value' , snap => {
           this.setState( {
             doors: snap.val()
@@ -34,20 +33,60 @@ export default class SelDoor extends React.Component {
     render() {
         return (
           <div className="container">
-            <p>
-              select your door:
-            </p>
-            <ListGroup>
-              { 
+            <Well>
+            <Form horizontal onSubmit={this.handleSubmit.bind(this)}>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={2}>
+                  Name
+                </Col>
+                <Col sm={10}>
+                  <FormControl type="input" placeholder="Name" id="name" value={this.props.name} disabled={this.props.app} />
+                </Col>
+              </FormGroup>
 
-                Object.keys(this.state.doors).map(item => {
-                  return <Litem chooseDoor={this.props.chooseDoor.bind(this, item)} item={item} key={item}/>;
-                })
-              }
-            </ListGroup>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={2}>
+                  Door
+                </Col>
+                <Col sm={10}>
+
+                    <FormControl componentClass="select" placeholder="select" id="door" >
+                      { 
+
+                        Object.keys(this.state.doors).map(item => {
+                          return <option value={item} key={item}>{item}</option>;
+                        })
+                      }
+                    </FormControl>
+
+                </Col>
+              </FormGroup>
+
+              <FormGroup>
+                <Col smOffset={2} sm={10}>
+                  <Checkbox  defaultChecked id="remember">Remember me</Checkbox>
+                </Col>
+              </FormGroup>
+
+              <FormGroup>
+                <Col smOffset={2} sm={10}>
+                  <Button type="submit">
+                    Sign in
+                  </Button>
+                </Col>
+              </FormGroup>
+            </Form>
+            </Well>
           </div>
         
         );
+    }
+    handleSubmit(event) {
+      event.preventDefault();
+      var name = document.getElementById("name").value;
+      var door = document.getElementById("door").value;
+      var remember = document.getElementById("remember").checked;
+      this.chooseDoor(name, door, remember);
     }
 
 }

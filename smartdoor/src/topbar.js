@@ -14,7 +14,7 @@ export default class Topbar extends React.Component {
           <Navbar inverse={false} onToggle={this.setNavExpanded.bind(this)} expanded={this.state.navExpanded}>
             <Navbar.Header>
               <Navbar.Brand>
-                <a onClick={this.props.pagechange.bind(this,"main")}><img alt="Brand" src={smlogo} className="App-smlogo" /> {this.props.door}  SmartDoor </a>
+                <a onClick={this.props.pagechange.bind(this,"main")} className="App-link"><img alt="Brand" src={smlogo} className="App-smlogo" /> {this.props.door}  SmartDoor </a>
 
               </Navbar.Brand>
               <Navbar.Toggle />
