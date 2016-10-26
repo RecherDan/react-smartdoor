@@ -65,8 +65,8 @@ export default class Memos extends React.Component {
         event.preventDefault();
 
         const task = ReactDOM.findDOMNode(this.refs.editInput).value;
-        const rootRef = firebase.database().ref().child('memos');
-        const doorRef = rootRef.child(this.props.doorid);
+        const rootRef = firebase.database().ref().child('doors').child(this.props.doorid);
+        const doorRef = rootRef.child('memos');
         doorRef.push({
           task,
         }
@@ -74,8 +74,8 @@ export default class Memos extends React.Component {
         ReactDOM.findDOMNode(this.refs.editInput).value = '';
     }
     deleteTask(taskToDelete) {
-        const rootRef = firebase.database().ref().child('memos');
-        const doorRef = rootRef.child(this.props.doorid);
+        const rootRef = firebase.database().ref().child('doors').child(this.props.doorid);
+        const doorRef = rootRef.child('memos');
         const memoRef = doorRef.child(taskToDelete);
         memoRef.remove();
     }

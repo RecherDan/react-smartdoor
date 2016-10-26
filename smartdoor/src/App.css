@@ -64,3 +64,31 @@ body { padding-bottom: 70px; }
   to { transform: rotate(360deg); }
 }
 
+
+table.scroll {
+    /* width: 100%; */ /* Optional */
+    /* border-collapse: collapse; */
+    border-spacing: 0;
+    border: 2px solid black;
+}
+
+table.scroll tbody,
+table.scroll thead { display: block; }
+
+thead tr th { 
+    height: 30px;
+    line-height: 30px;
+    /* text-align: left; */
+}
+
+table.scroll tbody {
+    height: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+
+tbody td:last-child, thead th:last-child {
+    border-right: none;
+}

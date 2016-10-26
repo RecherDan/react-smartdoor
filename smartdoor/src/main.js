@@ -17,10 +17,9 @@ firebase.initializeApp(config);
 var Forecast = require('react-forecast');
 
 
-
 export default class Main extends React.Component {
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.state = {
         memos: "",
         status: {
@@ -33,12 +32,15 @@ export default class Main extends React.Component {
         doorbutton: 'Open',
         lastmove: false,
         move: false,
-        showModal: false
+        showModal: false,
+        statusref: firebase.database().ref().child('doors').child(this.props.door)
       } 
     }
     componentDidMount() {
-      const rootRef = firebase.database().ref().child('memos');
+/*      const rootRef = firebase.database().ref().child('memos');
       const doorRef = rootRef.child(this.props.door);
+      var memos = "";
+      var status = "";
       //doorRef.set(mem);
       doorRef.on('value' , snap => {
           this.setState( {
@@ -46,58 +48,79 @@ export default class Main extends React.Component {
           }
           );
 
-      });
-      const rootRef2 = firebase.database().ref().child('doors');
-      const doorRef2 = rootRef2.child(this.props.door);
+      });*/
+      
       //doorRef.set(mem);
-      doorRef2.on('value' , snap => {
+      this.state.statusref.on('value' , snap => {
           this.setState( {
             status: snap.val()
           }
           );
 
       });
+      
       this.timer = setInterval( () => {
         var d = new Date();
         var online =  ((d.getTime() - this.state.status['time'] ) > 10000 ) ? "offline" : "online";
-        var doorbutton = (this.state.status['doorstatus'] === "Close" ) ? "Unlock" : "Lock";
-        var doorimg = (this.state.status['doorstatus'] === "Close" ) ? "./lock.png" : "./unlock.png";
-        if (this.state.status['doorstatus'] === "Middle" ) doorimg = "./error.png";
+        var doorbutton = (this.state.status['doorcurrentstatus'] === "Close" ) ? "Unlock" : "Lock";
+        var doorimg = (this.state.status['doorcurrentstatus'] === "Close" ) ? "./lock.png" : "./unlock.png";
+        if (this.state.status['doorcurrentstatus'] === "Middle" ) doorimg = "./error.png";
         var doorbuttondisabled = false;
         if ((this.state.status['doorstatus'] === "Locking") || (this.state.status['doorstatus'] === "Unlocking" )) {
           doorbutton = this.state.status['doorstatus'];
           doorbuttondisabled = true;
           doorimg = "./loading.gif"
         }
-        
+        var EmergencyButton = (this.state.status['Emergency'] === "On" ) ? "Stop Alarm" : "Emergency";
+        var EmergencyClick = (this.state.status['Emergency'] === "On" ) ? "AlarmOff" : "Emergency";
         var move = (this.state.status['move'] === undefined) ? "false" : this.state.status['move'] ;
-        var notification = (this.state.status['notification'] === undefined) ? "false" : this.state.status['notification'];
-        var lastnotification = this.state.notification;
+        //var notification = (this.state.status['notification'] === undefined) ? "false" : this.state.status['notification'];
+        //var lastnotification = this.state.notification;
+        var notification = ( this.state.status['notification'] === undefined ) ? { popup: "false" } : this.state.status['notification'];
+        var popup = ( notification['popup'] === undefined ) ? "false" : notification['popup'];
+        var lastpopup = this.state.popup;
         var lastmove = this.state.move;
-        this.setState( {
-         online: online,
-         doorbutton: doorbutton,
-         doorbuttondisabled: doorbuttondisabled,
-         doorimg: doorimg,
-         lastmove: (lastmove === undefined) ? "false" : lastmove,
-         move: move,
-         notification: notification,
-         lastnotification: (lastnotification === undefined) ? false : lastnotification
-        });
-        if ( ((lastmove !== move) && (notification === "false")) ||  lastnotification !== notification ) {
-          this.setState( {
-            showModal: (move === "true" ) ? true : ((notification === "true") ? true : false),
-            modaltitle: (notification === "true") ? this.state.status['notification-title'] : "Dont Forget!" ,
-            modalbody: (notification === "true") ? <div> {this.state.status['notification-msg']} </div> : <Memos memos={this.state.memos} doorid={this.props.door} /> 
-          });
 
-        }
+        var showModal = this.state.showModal;
+        var modaltitle = this.state.modaltitle;
+        var modalbody = this.state.modalbody;
+        var smokedetect = (this.state.status['smokedetect'] === "Detected") ? "Detected" : "Clean";
+        var alarm = (this.state.status['alarm'] === "On" ) ? "On" : "off";
+        var smokecolor = (smokedetect === "Clean") ? "App-green" : "App-red";
+        var alarmcolor = (alarm === "off") ? "App-green" : "App-red";
+        if ( ((lastmove !== move) && (popup === "false")) ||  lastpopup !== popup ) {
+          showModal = (move === "true" ) ? true : ((popup === "true") ? true : false);
+          modaltitle = (popup === "true") ? notification['title'] : "Dont Forget!";
+          var memos = this.state.status['memos'];
+          modalbody = (popup === "true") ? <div> {notification['msg']} </div> : <Memos memos={memos} doorid={this.props.door} />;
+        }        
+        this.setState( {
+          online: online,
+          doorbutton: doorbutton,
+          doorbuttondisabled: doorbuttondisabled,
+          doorimg: doorimg,
+          lastmove: (lastmove === undefined) ? "false" : lastmove,
+          move: move,
+          notification: notification,
+          popup: popup,
+          lastpopup: (lastpopup === undefined) ? "false" : lastpopup,
+          showModal: showModal,
+          modaltitle: modaltitle ,
+          modalbody: modalbody,
+          smokecolor: smokecolor,
+          alarmcolor: alarmcolor,
+          smokedetect: smokedetect,
+          alarm: alarm,
+          EmergencyButton: EmergencyButton,
+          EmergencyClick: EmergencyClick
+        });
       }, 50);
     }
 
     componentWillUnmount() {
          clearInterval(this.timer);
         this.timer = false;
+        this.state.statusref.off();
     }
     close() {
       this.setState({ showModal: false });
@@ -149,7 +172,7 @@ export default class Main extends React.Component {
                               <Button bsStyle="primary" bsSize="large" disabled={this.state.doorbuttondisabled} onClick={this.writecom.bind(this, this.state.doorbutton)}>{this.state.doorbutton} Door</Button>
                             </p>
                             <p>
-                              <Button bsStyle="danger" bsSize="large"  onClick={this.writecom.bind(this, "Emergency")}>Emergency</Button>
+                              <Button bsStyle="danger" bsSize="large"  onClick={this.writecom.bind(this, this.state.EmergencyClick)}>{this.state.EmergencyButton}</Button>
                             </p>
                                   </div>
                         </td>
@@ -179,11 +202,11 @@ export default class Main extends React.Component {
                     </tr>
                     <tr>
                       <td> smoke detector </td>
-                      <td>  {this.state.status['smokedetect']} </td>
+                      <td> <div className={this.state.smokecolor}> {this.state.smokedetect} </div> </td>
                     </tr>
                     <tr>
                       <td> Alarm is </td>
-                      <td>  {this.state.status['alarm']} </td>
+                      <td>  <div className={this.state.alarmcolor}>  {this.state.alarm} </div></td>
                     </tr>
                     </tbody>
                   </Table>
@@ -191,6 +214,18 @@ export default class Main extends React.Component {
                   </Col>
                   <Col xsHidden smHidden md={4}>
                   <Panel header="additional">
+                      <Table condensed>
+                      <tbody>
+                      <tr>
+                        <td> lan ip: </td>
+                        <td> {this.state.status['lanip']} </td>
+                      </tr>
+                      <tr>
+                        <td> ip: </td>
+                        <td> {this.state.status['ip']} </td>
+                      </tr>
+                      </tbody>
+                      </Table>
                   </Panel>
                   </Col>
                   </Row>
@@ -205,7 +240,7 @@ export default class Main extends React.Component {
             <Col xs={12} md={6}>
           <Panel header="Memos" eventKey="2">
             <Memos 
-              memos={this.state.memos} 
+              memos={this.state.status['memos']} 
               doorid={this.props.door} />
           </Panel>
             </Col>

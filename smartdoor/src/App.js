@@ -7,6 +7,7 @@ import Footer from './footer';
 import SelDoor from './seldoor';
 import Main from './main';
 import Help from './help';
+import Logs from './logs';
 import Settings from './settings';
 var config = {
       apiKey: "AIzaSyCRpzldmrnwtOf7M_TBBNGFofyswZ2IifQ",
@@ -110,7 +111,7 @@ class App extends Component {
       curpage: "main",
       app: false
     }
-    console.log("door " + getAllUrlParams().doorname + " name: " + getAllUrlParams().name );
+    //console.log("door " + getAllUrlParams().doorname + " name: " + getAllUrlParams().name );
     if ( getAllUrlParams().applogin === "true" ) {
       this.state = {
         doorselected: "true",
@@ -132,6 +133,8 @@ class App extends Component {
                 return <Help />
               case "settings":
                 return <Settings />
+              case "logs":
+                return <Logs door={this.state.door} />
               default:
                 return <Main doorchange={this.doorchange.bind(this) } door={this.state.door} name={this.state.name}/>;
             }

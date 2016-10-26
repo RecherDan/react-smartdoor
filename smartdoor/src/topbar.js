@@ -23,7 +23,8 @@ export default class Topbar extends React.Component {
               <Nav onSelect={this.closeNav.bind(this)}>
                 <NavItem><ButtonGroup bsSize="xsmall"><Button bsStyle="info" onClick={this.props.doorchange.bind(this)}>Change Door</Button></ButtonGroup></NavItem>
                 <NavItem eventKey={1}  onClick={this.props.pagechange.bind(this,"settings")}>Settings</NavItem>
-                <NavItem eventKey={2}  onClick={this.props.pagechange.bind(this,"help")}>Help</NavItem>
+                <NavItem eventKey={2}  onClick={this.props.pagechange.bind(this,"logs")}>Logs</NavItem>
+                <NavItem eventKey={3}  onClick={this.props.pagechange.bind(this,"help")}>Help</NavItem>
               </Nav>
             </Navbar.Collapse>
         
