@@ -17,9 +17,11 @@ export default class SelDoor extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        doors: ""
+        doors: "",
+        val: this.props.name
       } 
       this.chooseDoor = this.props.chooseDoor.bind(this);
+
     }
     componentDidMount() {
       const rootRef = firebase.database().ref().child('doors');
@@ -31,6 +33,7 @@ export default class SelDoor extends React.Component {
       });
     }
     render() {
+
         return (
           <div className="container">
             <Well>
@@ -40,7 +43,7 @@ export default class SelDoor extends React.Component {
                   Name
                 </Col>
                 <Col sm={10}>
-                  <FormControl type="input" placeholder="Name" id="name" value={this.props.name} disabled={this.props.app} />
+                  <FormControl type="input" placeholder="Name" id="name" defaultValue={this.state.val} disabled={this.props.app} />
                 </Col>
               </FormGroup>
 
