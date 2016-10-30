@@ -224,6 +224,10 @@ export default class Main extends React.Component {
                         <td> ip: </td>
                         <td> {this.state.status['ip']} </td>
                       </tr>
+                      <tr>
+                        <td> BT: </td>
+                        <td> {this.state.status['bt']} </td>
+                      </tr>
                       </tbody>
                       </Table>
                   </Panel>
