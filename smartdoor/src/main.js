@@ -61,7 +61,7 @@ export default class Main extends React.Component {
       
       this.timer = setInterval( () => {
         var d = new Date();
-        var online =  ((d.getTime() - this.state.status['time'] ) > 10000 ) ? "offline" : "online";
+        var online =  ((d.getTime() - this.state.status['time'] ) > 15000 ) ? "offline" : "online";
         var doorbutton = (this.state.status['doorcurrentstatus'] === "Close" ) ? "Unlock" : "Lock";
         var doorimg = (this.state.status['doorcurrentstatus'] === "Close" ) ? "./lock.png" : "./unlock.png";
         if (this.state.status['doorcurrentstatus'] === "Middle" ) doorimg = "./error.png";
@@ -77,7 +77,7 @@ export default class Main extends React.Component {
         //var notification = (this.state.status['notification'] === undefined) ? "false" : this.state.status['notification'];
         //var lastnotification = this.state.notification;
         var notification = ( this.state.status['notification'] === undefined ) ? { popup: "false" } : this.state.status['notification'];
-        var popup = ( notification['popup'] === undefined ) ? "false" : notification['popup'];
+        var popup = ( notification['popup'] === undefined ) ? "false" : (( d.getTime() - notification['stime'] < 15000) ? notification['popup'] : "false" );
         var lastpopup = this.state.popup;
         var lastmove = this.state.move;
 
