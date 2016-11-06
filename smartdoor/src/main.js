@@ -71,8 +71,8 @@ export default class Main extends React.Component {
           doorbuttondisabled = true;
           doorimg = "./loading.gif"
         }
-        var EmergencyButton = (this.state.status['Alarm'] === "On" ) ? "Stop Alarm" : "Emergency";
-        var EmergencyClick = (this.state.status['Alarm'] === "On" ) ? "AlarmOff" : "Emergency";
+        var EmergencyButton = (this.state.status['alarm'] === "On" ) ? "Stop Alarm" : "Emergency";
+        var EmergencyClick = (this.state.status['alarm'] === "On" ) ? "AlarmOff" : "Emergency";
         var move = (this.state.status['move'] === undefined) ? "false" : this.state.status['move'] ;
         //var notification = (this.state.status['notification'] === undefined) ? "false" : this.state.status['notification'];
         //var lastnotification = this.state.notification;
