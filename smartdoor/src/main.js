@@ -61,7 +61,7 @@ export default class Main extends React.Component {
       
       this.timer = setInterval( () => {
         var d = new Date();
-        var online =  ((d.getTime() - this.state.status['time'] ) > 15000 ) ? "offline" : "online";
+        var online =  ((d.getTime() - this.state.status['time'] ) > 20000 ) ? "offline" : "online";
         var doorbutton = (this.state.status['doorcurrentstatus'] === "Close" ) ? "Unlock" : "Lock";
         var doorimg = (this.state.status['doorcurrentstatus'] === "Close" ) ? "./lock.png" : "./unlock.png";
         if (this.state.status['doorcurrentstatus'] === "Middle" ) doorimg = "./error.png";
